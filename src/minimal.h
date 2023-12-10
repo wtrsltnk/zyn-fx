@@ -1,23 +1,21 @@
 #pragma once
 
+#include "Effects/EffectMgr.h"
+#include <memory>
+#include <mutex>
 #include <public.sdk/source/vst2.x/audioeffectx.h>
 
-class Minimal : public AudioEffectX
+class ZynAudioEffectX : public AudioEffectX
 {
 public:
-    Minimal(
+    ZynAudioEffectX(
         audioMasterCallback audioMaster);
-
-    ~Minimal();
+    
+    ~ZynAudioEffectX();
 
     virtual void processReplacing(
         float **inputs,
         float **outputs,
-        VstInt32 sampleFrames);
-
-    virtual void processDoubleReplacing(
-        double **inputs,
-        double **outputs,
         VstInt32 sampleFrames);
 
     virtual void setProgramName(
@@ -59,4 +57,7 @@ public:
 private:
     float _gain = 1.0f;
     char _programName[kVstMaxProgNameLen + 1];
+    std::unique_ptr<EffectMgr> _effectMgr;
+    bool _insertion;
+    std::mutex _mutex;
 };

@@ -1,129 +1,144 @@
 #include "minimal.h"
 
+#include "misc/Util.h"
 #include <string.h>
+
+static SYNTH_T s_synth;
+SYNTH_T *synth = &s_synth;
 
 //-------------------------------------------------------------------------------------------------------
 AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 {
-    return new Minimal(audioMaster);
+    s_synth.buffersize = 480;
+    s_synth.alias();
+
+    denormalkillbuf = new float[synth->buffersize];
+    for (int i = 0; i < synth->buffersize; ++i)
+    {
+        denormalkillbuf[i] = (RND - 0.5f) * 1e-16;
+    }
+
+    return new ZynAudioEffectX(audioMaster);
 }
 
 //-------------------------------------------------------------------------------------------------------
-Minimal::Minimal(audioMasterCallback audioMaster)
+ZynAudioEffectX::ZynAudioEffectX(audioMasterCallback audioMaster)
     : AudioEffectX(audioMaster, 1, 1) // 1 program, 1 parameter only
 {
     setNumInputs(2);       // stereo in
     setNumOutputs(2);      // stereo out
-    setUniqueID('Gain');   // identify
+    setUniqueID('ZYFX');   // identify
     canProcessReplacing(); // supports replacing output
-    canDoubleReplacing();  // supports double precision processing
 
     _gain = 1.f;                                           // default to 0 dB
     strcpy_s(_programName, kVstMaxProgNameLen, "Default"); // default program name
+
+    _effectMgr = std::make_unique<EffectMgr>(&_mutex);
+
+    _effectMgr->changeeffect(EffectTypes::ReverbType);
 }
 
 //-------------------------------------------------------------------------------------------------------
-Minimal::~Minimal()
+ZynAudioEffectX::~ZynAudioEffectX()
 {
     // nothing to do here
 }
 
+//-----------------------------------------------------------------------------------------
+void ZynAudioEffectX::processReplacing(
+    float **inputs,
+    float **outputs,
+    VstInt32 sampleFrames)
+{
+    float *in1 = inputs[0];
+    float *in2 = inputs[1];
+
+    float *out1 = outputs[0];
+    float *out2 = outputs[1];
+
+    do
+    {
+        auto frames = _effectMgr->out(in1, in2, sampleFrames);
+
+        float *procl = _effectMgr->efxoutl;
+        float *procr = _effectMgr->efxoutr;
+
+        for (int i = 0; i < frames; i++)
+        {
+            (*out1++) = (*procl++) * _gain;
+            (*out2++) = (*procr++) * _gain;
+        }
+
+        sampleFrames -= frames;
+
+    } while (sampleFrames > 0);
+}
+
 //-------------------------------------------------------------------------------------------------------
-void Minimal::setProgramName(char *name)
+void ZynAudioEffectX::setProgramName(char *name)
 {
     strcpy_s(_programName, kVstMaxProgNameLen, name);
 }
 
 //-----------------------------------------------------------------------------------------
-void Minimal::getProgramName(char *name)
+void ZynAudioEffectX::getProgramName(char *name)
 {
     strcpy_s(name, kVstMaxProgNameLen, _programName);
 }
 
 //-----------------------------------------------------------------------------------------
-void Minimal::setParameter(VstInt32 index, float value)
+void ZynAudioEffectX::setParameter(VstInt32 index, float value)
 {
     _gain = value;
 }
 
 //-----------------------------------------------------------------------------------------
-float Minimal::getParameter(VstInt32 index)
+float ZynAudioEffectX::getParameter(VstInt32 index)
 {
     return _gain;
 }
 
 //-----------------------------------------------------------------------------------------
-void Minimal::getParameterName(VstInt32 index, char *label)
+void ZynAudioEffectX::getParameterName(VstInt32 index, char *label)
 {
     strcpy_s(label, kVstMaxParamStrLen, "Gain");
 }
 
 //-----------------------------------------------------------------------------------------
-void Minimal::getParameterDisplay(VstInt32 index, char *text)
+void ZynAudioEffectX::getParameterDisplay(VstInt32 index, char *text)
 {
     dB2string(_gain, text, kVstMaxParamStrLen);
 }
 
 //-----------------------------------------------------------------------------------------
-void Minimal::getParameterLabel(VstInt32 index, char *label)
+void ZynAudioEffectX::getParameterLabel(VstInt32 index, char *label)
 {
     strcpy_s(label, kVstMaxParamStrLen, "dB");
 }
 
 //------------------------------------------------------------------------
-bool Minimal::getEffectName(char *name)
+bool ZynAudioEffectX::getEffectName(char *name)
 {
-    strcpy_s(name, kVstMaxEffectNameLen, "Gain");
+    strcpy_s(name, kVstMaxEffectNameLen, "Zyn.Fx");
     return true;
 }
 
 //------------------------------------------------------------------------
-bool Minimal::getProductString(char *text)
+bool ZynAudioEffectX::getProductString(char *text)
 {
-    strcpy_s(text, kVstMaxProductStrLen, "Gain");
+    strcpy_s(text, kVstMaxProductStrLen, "Zyn.Fx");
     return true;
 }
 
 //------------------------------------------------------------------------
-bool Minimal::getVendorString(char *text)
+bool ZynAudioEffectX::getVendorString(char *text)
 {
-    strcpy_s(text, kVstMaxVendorStrLen, "Wouter");
+    strcpy_s(text, kVstMaxVendorStrLen, "ZynAddSubFx");
     return true;
 }
 
 //-----------------------------------------------------------------------------------------
-VstInt32 Minimal::getVendorVersion()
+VstInt32 ZynAudioEffectX::getVendorVersion()
 {
-    return 1000;
-}
-
-//-----------------------------------------------------------------------------------------
-void Minimal::processReplacing(float **inputs, float **outputs, VstInt32 sampleFrames)
-{
-    float *in1 = inputs[0];
-    float *in2 = inputs[1];
-    float *out1 = outputs[0];
-    float *out2 = outputs[1];
-
-    while (--sampleFrames >= 0)
-    {
-        (*out1++) = (*in1++) * _gain;
-        (*out2++) = (*in2++) * _gain;
-    }
-}
-
-//-----------------------------------------------------------------------------------------
-void Minimal::processDoubleReplacing(double **inputs, double **outputs, VstInt32 sampleFrames)
-{
-    double *in1 = inputs[0];
-    double *in2 = inputs[1];
-    double *out1 = outputs[0];
-    double *out2 = outputs[1];
-    double dGain = _gain;
-
-    while (--sampleFrames >= 0)
-    {
-        (*out1++) = (*in1++) * dGain;
-        (*out2++) = (*in2++) * dGain;
-    }
+    return 1001;
 }
