@@ -63,7 +63,7 @@ void EQ::out(const Stereo<float *> &smp,
              int bufSize)
 {
     buffersize = bufSize;
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         efxoutl[i] = smp.l[i] * volume;
@@ -89,16 +89,14 @@ void EQ::setvolume(unsigned char _Pvolume)
 
 void EQ::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 1;
-    const int NUM_PRESETS = 2;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[EQ_NUM_PRESETS][EQ_PRESET_SIZE] = {
         {67}, // EQ 1
         {67}  // EQ 2
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= EQ_NUM_PRESETS)
+        npreset = EQ_NUM_PRESETS - 1;
+    for (int n = 0; n < EQ_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }

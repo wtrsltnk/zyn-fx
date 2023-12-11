@@ -1,16 +1,41 @@
 #pragma once
 
 #include "Effects/EffectMgr.h"
+#include "vstcontrol.h"
 #include <memory>
 #include <mutex>
+#include <public.sdk/source/vst2.x/aeffeditor.h>
 #include <public.sdk/source/vst2.x/audioeffectx.h>
+
+class ZynEditor : public AEffEditor
+{
+public:
+    ZynEditor(AudioEffect *effect);
+
+    virtual bool getRect(
+        ERect **rect);
+
+    virtual bool open(
+        void *ptr);
+
+    virtual void close();
+
+    virtual bool isOpen();
+
+    virtual void idle();
+
+protected:
+private:
+    VstControl _main;
+    ERect _rect;
+};
 
 class ZynAudioEffectX : public AudioEffectX
 {
 public:
     ZynAudioEffectX(
         audioMasterCallback audioMaster);
-    
+
     ~ZynAudioEffectX();
 
     virtual void processReplacing(
@@ -58,6 +83,6 @@ private:
     float _gain = 1.0f;
     char _programName[kVstMaxProgNameLen + 1];
     std::unique_ptr<EffectMgr> _effectMgr;
-    bool _insertion;
+    ZynEditor *_editor = nullptr;
     std::mutex _mutex;
 };

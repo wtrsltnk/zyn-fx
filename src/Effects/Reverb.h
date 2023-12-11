@@ -28,6 +28,9 @@
 #define REV_COMBS 8
 #define REV_APS 4
 
+const int REVERB_PRESET_SIZE = 13;
+const int REVERB_NUM_PRESETS = 13;
+
 /**Creates Reverberation Effects*/
 class Reverb : public Effect
 {
@@ -124,6 +127,8 @@ private:
     int apk[REV_APS * 2] = {0};
     float *idelay = nullptr;
     class AnalogFilter *lpf = nullptr, *hpf = nullptr; // filters
+
+    std::vector<float> inputbuf;
 };
 
 #endif

@@ -26,6 +26,9 @@
 #include "../Misc/Stereo.h"
 #include "Effect.h"
 
+const int ECHO_PRESET_SIZE = 7;
+const int ECHO_NUM_PRESETS = 9;
+
 /**Echo Effect*/
 class Echo : public Effect
 {

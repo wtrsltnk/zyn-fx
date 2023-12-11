@@ -68,7 +68,7 @@ void DynamicFilter::out(const Stereo<float *> &smp,
     lfor *= depth * 5.0f;
     const float freq = filterpars->getfreq();
     const float q = filterpars->getq();
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         efxoutl[i] = smp.l[i];
@@ -141,9 +141,7 @@ void DynamicFilter::reinitfilter(void)
 
 void DynamicFilter::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 10;
-    const int NUM_PRESETS = 5;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[DYNAMICFILTER_NUM_PRESETS][DYNAMICFILTER_PRESET_SIZE] = {
         // WahWah
         {110, 64, 80, 0, 0, 64, 0, 90, 0, 60},
         // AutoWah
@@ -155,9 +153,9 @@ void DynamicFilter::setpreset(unsigned char npreset)
         // VocalMorph1
         {127, 64, 50, 0, 0, 96, 64, 0, 0, 60}};
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= DYNAMICFILTER_NUM_PRESETS)
+        npreset = DYNAMICFILTER_NUM_PRESETS - 1;
+    for (int n = 0; n < DYNAMICFILTER_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
 
     filterpars->defaults();

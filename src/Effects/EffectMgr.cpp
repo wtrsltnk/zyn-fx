@@ -23,15 +23,33 @@
 #include "EffectMgr.h"
 
 #include "../Misc/Util.h"
-#include "Alienwah.h"
-#include "Chorus.h"
-#include "Distorsion.h"
-#include "DynamicFilter.h"
-#include "EQ.h"
-#include "Echo.h"
+
 #include "Effect.h"
+
+#ifdef ZYN_ALIENWAH_VST
+#include "Alienwah.h"
+#endif
+#ifdef ZYN_CHORUS_VST
+#include "Chorus.h"
+#endif
+#ifdef ZYN_DISTORSION_VST
+#include "Distorsion.h"
+#endif
+#ifdef ZYN_DYNAMICFILTER_VST
+#include "DynamicFilter.h"
+#endif
+#ifdef ZYN_EQ_VST
+#include "EQ.h"
+#endif
+#ifdef ZYN_ECHO_VST
+#include "Echo.h"
+#endif
+#ifdef ZYN_PHASER_VST
 #include "Phaser.h"
+#endif
+#ifdef ZYN_REVERB_VST
 #include "Reverb.h"
+#endif
 
 EffectMgr::EffectMgr(
     std::mutex *mutex_)
@@ -75,30 +93,46 @@ void EffectMgr::changeeffect(
     delete efx;
     switch (nefx)
     {
+#ifdef ZYN_REVERB_VST
         case EffectTypes::ReverbType:
             efx = new Reverb(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_ECHO_VST
         case EffectTypes::EchoType:
             efx = new Echo(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_CHORUS_VST
         case EffectTypes::ChorusType:
             efx = new Chorus(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_PHASER_VST
         case EffectTypes::PhaserType:
             efx = new Phaser(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_ALIENWAH_VST
         case EffectTypes::AlienwahType:
             efx = new Alienwah(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_DISTORSION_VST
         case EffectTypes::DistorsionType:
             efx = new Distorsion(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_EQ_VST
         case EffectTypes::EQType:
             efx = new EQ(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
+#ifdef ZYN_DYNAMICFILTER_VST
         case EffectTypes::DynamicFilterType:
             efx = new DynamicFilter(efxoutl, efxoutr, synth->samplerate, synth->buffersize);
             break;
+#endif
         // put more effect here
         default:
             efx = nullptr;
@@ -201,7 +235,7 @@ int EffectMgr::out(
 
     if (!efx)
     {
-        return bufferSize;
+        return bufSize;
     }
 
     for (int i = 0; i < bufSize; ++i)
@@ -212,10 +246,11 @@ int EffectMgr::out(
         efxoutr[i] = 0.0f;
     }
 
-    efx->out(smpsl, smpsr, bufferSize);
+    efx->out(smpsl, smpsr, bufSize);
 
     float volume = efx->volume;
 
+#ifdef ZYN_EQ_VST
     if (nefx == EffectTypes::EQType)
     {
         // this is need only for the EQ effect
@@ -224,6 +259,7 @@ int EffectMgr::out(
 
         return bufferSize;
     }
+#endif
 
     // System effect
     for (int i = 0; i < bufSize; ++i)

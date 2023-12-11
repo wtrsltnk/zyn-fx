@@ -26,6 +26,9 @@
 #include "Effect.h"
 #include "EffectLFO.h"
 
+const int DYNAMICFILTER_PRESET_SIZE = 10;
+const int DYNAMICFILTER_NUM_PRESETS = 5;
+
 /**DynamicFilter Effect*/
 class DynamicFilter : public Effect
 {

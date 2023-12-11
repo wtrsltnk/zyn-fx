@@ -31,6 +31,9 @@ using namespace std;
 
 #define MAX_ALIENWAH_DELAY 100
 
+const int ALIENWAH_PRESET_SIZE = 11;
+const int ALIENWAH_NUM_PRESETS = 4;
+
 /**"AlienWah" Effect*/
 class Alienwah : public Effect
 {

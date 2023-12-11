@@ -32,6 +32,9 @@
 
 #define MAX_PHASER_STAGES 12
 
+const int PHASER_PRESET_SIZE = 15;
+const int PHASER_NUM_PRESETS = 12;
+
 class Phaser : public Effect
 {
 public:

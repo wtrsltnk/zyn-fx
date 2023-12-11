@@ -90,7 +90,7 @@ void Echo::out(const Stereo<float *> &input,
                int bufSize)
 {
     buffersize = bufSize;
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         float ldl = delay.l[pos.l];
@@ -168,9 +168,7 @@ void Echo::sethidamp(unsigned char _Phidamp)
 
 void Echo::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 7;
-    const int NUM_PRESETS = 9;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[ECHO_NUM_PRESETS][ECHO_PRESET_SIZE] = {
         {67, 64, 35, 64, 30, 59, 0},    // Echo 1
         {67, 64, 21, 64, 30, 59, 0},    // Echo 2
         {67, 75, 60, 64, 30, 59, 10},   // Echo 3
@@ -182,9 +180,9 @@ void Echo::setpreset(unsigned char npreset)
         {62, 64, 28, 64, 100, 90, 55}   // Feedback Echo
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= ECHO_NUM_PRESETS)
+        npreset = ECHO_NUM_PRESETS - 1;
+    for (int n = 0; n < ECHO_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
 
     Ppreset = npreset;

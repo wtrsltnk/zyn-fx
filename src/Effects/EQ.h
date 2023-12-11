@@ -25,6 +25,9 @@
 
 #include "Effect.h"
 
+const int EQ_PRESET_SIZE = 1;
+const int EQ_NUM_PRESETS = 2;
+
 /**EQ Effect*/
 class EQ : public Effect
 {

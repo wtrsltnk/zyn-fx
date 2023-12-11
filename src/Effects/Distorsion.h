@@ -25,6 +25,9 @@
 
 #include "Effect.h"
 
+const int DISTORSION_PRESET_SIZE = 11;
+const int DISTORSION_NUM_PRESETS = 6;
+
 /**Distortion Effect*/
 class Distorsion : public Effect
 {

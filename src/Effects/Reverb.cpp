@@ -33,6 +33,8 @@ Reverb::Reverb(
     int bufsize)
     : Effect(efxoutl_, efxoutr_, NULL, 0, srate, bufsize)
 {
+    inputbuf.resize(bufsize);
+
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
         comblen[i] = 800 + (int)(RND * 1400.0f);
@@ -135,16 +137,19 @@ void Reverb::processmono(
 }
 
 // Effect output
-void Reverb::out(const Stereo<float *> &smp, int bufSize)
+void Reverb::out(
+    const Stereo<float *> &smp,
+    int bufSize)
 {
     buffersize = bufSize;
 
-    std::vector<float> inputbuf(buffersize);
-
     for (int i = 0; i < buffersize; ++i)
+    {
         inputbuf[i] = (smp.l[i] + smp.r[i]) / 2.0f;
+    }
 
     if (idelay)
+    {
         for (int i = 0; i < buffersize; ++i)
         {
             // Initial delay r
@@ -155,6 +160,7 @@ void Reverb::out(const Stereo<float *> &smp, int bufSize)
             if (idelayk >= idelaylen)
                 idelayk = 0;
         }
+    }
 
     if (bandwidth)
         bandwidth->process(buffersize, inputbuf.data());
@@ -178,25 +184,30 @@ void Reverb::out(const Stereo<float *> &smp, int bufSize)
 }
 
 // Parameter control
-void Reverb::setvolume(unsigned char _Pvolume)
+void Reverb::setvolume(
+    unsigned char _Pvolume)
 {
     Pvolume = _Pvolume;
     outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
     volume = 1.0f;
 }
 
-void Reverb::settime(unsigned char _Ptime)
+void Reverb::settime(
+    unsigned char _Ptime)
 {
     Ptime = _Ptime;
     float t = powf(60.0f, Ptime / 127.0f) - 0.97f;
 
     for (int i = 0; i < REV_COMBS * 2; ++i)
-        combfb[i] =
-            -expf((float)comblen[i] / samplerate_f * logf(0.001f) / t);
+    {
+        combfb[i] = -expf((float)comblen[i] / samplerate_f * logf(0.001f) / t);
+    }
+
     // the feedback is negative because it removes the DC
 }
 
-void Reverb::setlohidamp(unsigned char _Plohidamp)
+void Reverb::setlohidamp(
+    unsigned char _Plohidamp)
 {
     Plohidamp = (_Plohidamp < 64) ? 64 : _Plohidamp;
     // remove this when the high part from lohidamp is added
@@ -216,7 +227,8 @@ void Reverb::setlohidamp(unsigned char _Plohidamp)
     }
 }
 
-void Reverb::setidelay(unsigned char _Pidelay)
+void Reverb::setidelay(
+    unsigned char _Pidelay)
 {
     Pidelay = _Pidelay;
     float delay = powf(50.0f * Pidelay / 127.0f, 2.0f) - 1.0f;
@@ -234,13 +246,15 @@ void Reverb::setidelay(unsigned char _Pidelay)
     }
 }
 
-void Reverb::setidelayfb(unsigned char _Pidelayfb)
+void Reverb::setidelayfb(
+    unsigned char _Pidelayfb)
 {
     Pidelayfb = _Pidelayfb;
     idelayfb = Pidelayfb / 128.0f;
 }
 
-void Reverb::sethpf(unsigned char _Phpf)
+void Reverb::sethpf(
+    unsigned char _Phpf)
 {
     Phpf = _Phpf;
     if (Phpf == 0)
@@ -259,7 +273,8 @@ void Reverb::sethpf(unsigned char _Phpf)
     }
 }
 
-void Reverb::setlpf(unsigned char _Plpf)
+void Reverb::setlpf(
+    unsigned char _Plpf)
 {
     Plpf = _Plpf;
     if (Plpf == 127)
@@ -278,7 +293,8 @@ void Reverb::setlpf(unsigned char _Plpf)
     }
 }
 
-void Reverb::settype(unsigned char _Ptype)
+void Reverb::settype(
+    unsigned char _Ptype)
 {
     Ptype = _Ptype;
     const int NUM_TYPES = 3;
@@ -288,7 +304,8 @@ void Reverb::settype(unsigned char _Ptype)
         // Freeverb by Jezar at Dreampoint
         {1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617},
         // duplicate of Freeverb by Jezar at Dreampoint
-        {1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617}};
+        {1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617},
+    };
 
     const int aptunings[NUM_TYPES][REV_APS] = {
         // this is unused (for random)
@@ -296,7 +313,8 @@ void Reverb::settype(unsigned char _Ptype)
         // Freeverb by Jezar at Dreampoint
         {225, 341, 441, 556},
         // duplicate of Freeverb by Jezar at Dreampoint
-        {225, 341, 441, 556}};
+        {225, 341, 441, 556},
+    };
 
     if (Ptype >= NUM_TYPES)
         Ptype = NUM_TYPES - 1;
@@ -358,32 +376,40 @@ void Reverb::settype(unsigned char _Ptype)
     cleanup();
 }
 
-void Reverb::setroomsize(unsigned char _Proomsize)
+void Reverb::setroomsize(
+    unsigned char _Proomsize)
 {
     Proomsize = _Proomsize;
     if (!Proomsize)
+    {
         this->Proomsize = 64; // this is because the older versions consider roomsize=0
+    }
+
     roomsize = (this->Proomsize - 64.0f) / 64.0f;
     if (roomsize > 0.0f)
+    {
         roomsize *= 2.0f;
+    }
+
     roomsize = powf(10.0f, roomsize);
     rs = sqrtf(roomsize);
     settype(Ptype);
 }
 
-void Reverb::setbandwidth(unsigned char _Pbandwidth)
+void Reverb::setbandwidth(
+    unsigned char _Pbandwidth)
 {
     Pbandwidth = _Pbandwidth;
     float v = Pbandwidth / 127.0f;
     if (bandwidth)
+    {
         bandwidth->setBandwidth(powf(v, 2.0f) * 200.0f);
+    }
 }
 
 void Reverb::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 13;
-    const int NUM_PRESETS = 13;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[REVERB_NUM_PRESETS][REVERB_PRESET_SIZE] = {
         // Cathedral1
         {80, 64, 63, 24, 0, 0, 0, 85, 5, 83, 1, 64, 20},
         // Cathedral2
@@ -409,17 +435,25 @@ void Reverb::setpreset(unsigned char npreset)
         // VeryLong1
         {90, 64, 93, 15, 0, 0, 0, 114, 0, 77, 0, 95, 20},
         // VeryLong2
-        {90, 64, 111, 30, 0, 0, 0, 114, 90, 74, 1, 80, 20}};
+        {90, 64, 111, 30, 0, 0, 0, 114, 90, 74, 1, 80, 20},
+    };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= REVERB_NUM_PRESETS)
+    {
+        npreset = REVERB_NUM_PRESETS - 1;
+    }
+
+    for (int n = 0; n < REVERB_PRESET_SIZE; ++n)
+    {
         changepar(n, presets[npreset][n]);
+    }
 
     Ppreset = npreset;
 }
 
-void Reverb::changepar(int npar, unsigned char value)
+void Reverb::changepar(
+    int npar,
+    unsigned char value)
 {
     switch (npar)
     {
@@ -465,7 +499,8 @@ void Reverb::changepar(int npar, unsigned char value)
     }
 }
 
-unsigned char Reverb::getpar(int npar) const
+unsigned char Reverb::getpar(
+    int npar) const
 {
     switch (npar)
     {

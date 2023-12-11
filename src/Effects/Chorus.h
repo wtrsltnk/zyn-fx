@@ -28,6 +28,9 @@
 
 #define MAX_CHORUS_DELAY 250.0f // ms
 
+const int CHORUS_PRESET_SIZE = 12;
+const int CHORUS_NUM_PRESETS = 10;
+
 /**Chorus and Flange effects*/
 class Chorus : public Effect
 {

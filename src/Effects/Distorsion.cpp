@@ -104,7 +104,7 @@ void Distorsion::out(
 
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
-
+    
     waveShapeSmps(buffersize, efxoutl, Ptype + 1, Pdrive);
     if (Pstereo)
         waveShapeSmps(buffersize, efxoutr, Ptype + 1, Pdrive);
@@ -164,9 +164,7 @@ void Distorsion::sethpf(
 void Distorsion::setpreset(
     unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 6;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[DISTORSION_NUM_PRESETS][DISTORSION_PRESET_SIZE] = {
         // Overdrive 1
         {127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0},
         // Overdrive 2
@@ -180,9 +178,9 @@ void Distorsion::setpreset(
         // Quantisize
         {127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0}};
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= DISTORSION_NUM_PRESETS)
+        npreset = DISTORSION_NUM_PRESETS - 1;
+    for (int n = 0; n < DISTORSION_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
 
     // lower the volume if this is system effect

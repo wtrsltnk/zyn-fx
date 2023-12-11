@@ -64,7 +64,7 @@ void Alienwah::out(const Stereo<float *> &smp,
     lfor *= depth * PI * 2.0f;
     clfol = complex<float>(cosf(lfol + phase) * fb, sinf(lfol + phase) * fb); // rework
     clfor = complex<float>(cosf(lfor + phase) * fb, sinf(lfor + phase) * fb); // rework
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         float x = ((float)i) / buffersize_f;
@@ -154,9 +154,7 @@ void Alienwah::setdelay(unsigned char _Pdelay)
 
 void Alienwah::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 4;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[ALIENWAH_NUM_PRESETS][ALIENWAH_PRESET_SIZE] = {
         // AlienWah1
         {127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64},
         // AlienWah2
@@ -166,9 +164,9 @@ void Alienwah::setpreset(unsigned char npreset)
         // AlienWah4
         {93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86}};
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= ALIENWAH_NUM_PRESETS)
+        npreset = ALIENWAH_NUM_PRESETS - 1;
+    for (int n = 0; n < ALIENWAH_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
 
     changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect

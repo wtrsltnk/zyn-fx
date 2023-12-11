@@ -150,7 +150,7 @@ void Phaser::AnalogPhase(
 
     g = oldgain;
     oldgain = mod;
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         g.l += diff.l; // Linear interpolation between LFO samples
@@ -231,7 +231,7 @@ void Phaser::normalPhase(
 
     gain.l = limit(gain.l, ZERO_, ONE_);
     gain.r = limit(gain.r, ZERO_, ONE_);
-
+    
     for (int i = 0; i < buffersize; ++i)
     {
         float x = (float)i / buffersize_f;
@@ -384,9 +384,7 @@ void Phaser::setdepth(
 void Phaser::setpreset(
     unsigned char npreset)
 {
-    const int PRESET_SIZE = 15;
-    const int NUM_PRESETS = 12;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[PHASER_NUM_PRESETS][PHASER_PRESET_SIZE] = {
         // Phaser
         // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
         {64, 64, 36, 0, 0, 64, 110, 64, 1, 0, 0, 20,
@@ -416,9 +414,9 @@ void Phaser::setpreset(
          1},
         {64, 64, 1, 10, 1, 64, 70, 40, 12, 10, 0, 110, 1, 20,
          1}};
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    if (npreset >= PHASER_NUM_PRESETS)
+        npreset = PHASER_NUM_PRESETS - 1;
+    for (int n = 0; n < PHASER_PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
