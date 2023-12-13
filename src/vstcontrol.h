@@ -13,6 +13,8 @@
 class VstControl
 {
 public:
+    VstControl(
+        const char *windowClassName);
     virtual ~VstControl();
 
     bool init(HWND parent, int width, int height);
@@ -28,6 +30,7 @@ protected:
     int height() { return _height; }
 
 private:
+    const char *_windowClassName = nullptr;
     HWND _hParent = nullptr;
     HGLRC _hRC = nullptr;
     HDC _hDC = nullptr;

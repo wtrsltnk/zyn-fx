@@ -3,6 +3,11 @@
 #include <glad/glad_wgl.h>
 #include <iostream>
 
+VstControl::VstControl(
+    const char *windowClassName)
+    : _windowClassName(windowClassName)
+{}
+
 VstControl::~VstControl() = default;
 
 // Forward declarations of helper functions
@@ -34,12 +39,12 @@ bool VstControl::init(
         /*.hCursor =*/nullptr,
         /*.hbrBackground =*/nullptr,
         /*.lpszMenuName =*/nullptr,
-        /*.lpszClassName =*/"VstControl",
+        /*.lpszClassName =*/_windowClassName,
         /*.hIconSm =*/nullptr,
     };
 
     WNDCLASSEX wincl;
-    if (!GetClassInfoEx(hInst, "VstControl", &wincl))
+    if (!GetClassInfoEx(hInst, _windowClassName, &wincl))
     {
         if (!RegisterClassEx(&wc))
         {
@@ -48,7 +53,7 @@ bool VstControl::init(
     }
 
     _hWnd = CreateWindowEx(
-        0, "VstControl", "VstControl",
+        0, _windowClassName, "VstControl",
         WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE,
         0, 0, width, height,
         _hParent,
@@ -159,7 +164,7 @@ bool VstControl::init(
 
     ImGui::StyleColorsDark();
 
-//    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.82f, 0.92f, 1.00f, 0.90f);
+    //    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.82f, 0.92f, 1.00f, 0.90f);
 
     io.Fonts->Clear();
     ImFont *font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 16.0f);
@@ -313,7 +318,7 @@ LRESULT VstControl::ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
             wglDeleteContext(_hRC);
             _hRC = nullptr;
 
-            UnregisterClass("VstControl", GetModuleHandle(nullptr));
+            UnregisterClass(_windowClassName, GetModuleHandle(nullptr));
             _hWnd = nullptr;
 
             return 0;

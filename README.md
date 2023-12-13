@@ -2,7 +2,11 @@
 
 All the effects from ZynAddSubFx as VST 2 plugins.
 
-## Alien Wah
+## AlienWah
 
 ![AlienWah](docs/alienwah.png)
+
+## Chorus
+
+![Chorus](docs/chorus.png)
 

@@ -8,10 +8,13 @@
 #include <public.sdk/source/vst2.x/aeffeditor.h>
 #include <public.sdk/source/vst2.x/audioeffectx.h>
 
+class ZynAudioEffectX;
+
 class ZynEditor : public AEffEditor
 {
 public:
-    ZynEditor(class ZynAudioEffectX *effect);
+    ZynEditor(
+        ZynAudioEffectX *effect);
 
     virtual bool getRect(
         ERect **rect);

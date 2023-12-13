@@ -190,19 +190,6 @@ static std::vector<std::string> echoPresetNames = {
     "Feedback Echo",
 };
 
-static std::vector<std::string> chorusPresetNames = {
-    "Chorus 1",
-    "Chorus 2",
-    "Chorus 3",
-    "Celeste 1",
-    "Celeste 2",
-    "Flange 1",
-    "Flange 2",
-    "Flange 3",
-    "Flange 4",
-    "Flange 5",
-};
-
 static std::vector<std::string> phaserPresetNames = {
     "Phaser 1",
     "Phaser 2",
@@ -287,6 +274,7 @@ static std::vector<std::string> eqBandTypes = {
 ZynEditor::ZynEditor(
     ZynAudioEffectX *effect)
     : AEffEditor(effect),
+      _main("AlienWahControl"),
       _zynAudioEffectX(effect)
 {}
 
