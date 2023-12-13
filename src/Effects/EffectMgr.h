@@ -29,7 +29,7 @@ class FilterParams;
 
 #include "../Params/FilterParams.h"
 
-enum EffectTypes
+enum class EffectTypes
 {
     None = 0,
     ReverbType = 1,

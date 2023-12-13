@@ -1,3 +1,8 @@
-# zyn-chorus-vst
+# zyn-fx-vst
 
-Th VST SDK AGain example into a cmake template for dotcpp.
+All the effects from ZynAddSubFx as VST 2 plugins.
+
+## Alien Wah
+
+![AlienWah](docs/alienwah.png)
+

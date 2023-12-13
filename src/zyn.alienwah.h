@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Effects/EffectMgr.h"
+#include "Effects/EffectPresets.h"
 #include "vstcontrol.h"
 #include <memory>
 #include <mutex>
@@ -10,7 +11,7 @@
 class ZynEditor : public AEffEditor
 {
 public:
-    ZynEditor(AudioEffect *effect);
+    ZynEditor(class ZynAudioEffectX *effect);
 
     virtual bool getRect(
         ERect **rect);
@@ -28,6 +29,22 @@ protected:
 private:
     VstControl _main;
     ERect _rect;
+    ZynAudioEffectX *_zynAudioEffectX;
+
+    void Knob(
+        EffectPresets par,
+        const char *label,
+        const char *tooltip = nullptr);
+
+    void Knob(
+        AlienWahPresets par,
+        const char *label,
+        const char *tooltip = nullptr);
+
+    void Knob(
+        int par,
+        const char *label,
+        const char *tooltip = nullptr);
 };
 
 class ZynAudioEffectX : public AudioEffectX
@@ -78,6 +95,8 @@ public:
         char *text);
 
     virtual VstInt32 getVendorVersion();
+
+    const std::unique_ptr<EffectMgr> &EffectManager() const { return _effectMgr; }
 
 private:
     float _gain = 1.0f;

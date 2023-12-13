@@ -52,10 +52,12 @@ add_library(zyn STATIC
     src/Params/FilterParams.cpp
     src/Params/FilterParams.h
     src/globals.h
+    src/imgui_common.cpp
+    src/imgui_common.h
+    src/imgui_knob.cpp
+    src/imgui_knob.h
     src/vstcontrol.cpp
     src/vstcontrol.h
-    # src/vstknob.cpp
-    # src/vstknob.h
     ${VST2_SDK_ROOT}/public.sdk/source/vst2.x/audioeffectx.cpp
     ${VST2_SDK_ROOT}/public.sdk/source/vst2.x/audioeffect.cpp
     ${VST2_SDK_ROOT}/pluginterfaces/vst2.x/aeffectx.h

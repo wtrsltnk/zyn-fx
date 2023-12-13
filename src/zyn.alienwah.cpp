@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "imgui_knob.h"
 #include "misc/Util.h"
 
 static SYNTH_T s_synth;
@@ -149,9 +150,144 @@ VstInt32 ZynAudioEffectX::getVendorVersion()
     return 1001;
 }
 
+std::vector<std::string> EffectNames = {
+    "No effect",
+    "Reverb",
+    "Echo",
+    "Chorus",
+    "Phaser",
+    "AlienWah",
+    "Distortion",
+    "Equalizer",
+    "DynFilter",
+};
+
+static std::vector<std::string> reverbPresetNames = {
+    "Cathedral 1",
+    "Cathedral 2",
+    "Cathedral 3",
+    "Hall 1",
+    "Hall 2",
+    "Room 1",
+    "Room 2",
+    "Basement",
+    "Tunnel",
+    "Echoed 1",
+    "Echoed 2",
+    "Very Long 1",
+    "Very Long 2",
+};
+
+static std::vector<std::string> echoPresetNames = {
+    "Echo 1",
+    "Echo 2",
+    "Echo 3",
+    "Simple Echo",
+    "Canyon",
+    "Panning Echo 1",
+    "Panning Echo 2",
+    "Panning Echo 3",
+    "Feedback Echo",
+};
+
+static std::vector<std::string> chorusPresetNames = {
+    "Chorus 1",
+    "Chorus 2",
+    "Chorus 3",
+    "Celeste 1",
+    "Celeste 2",
+    "Flange 1",
+    "Flange 2",
+    "Flange 3",
+    "Flange 4",
+    "Flange 5",
+};
+
+static std::vector<std::string> phaserPresetNames = {
+    "Phaser 1",
+    "Phaser 2",
+    "Phaser 3",
+    "Phaser 4",
+    "Phaser 5",
+    "Phaser 6",
+    "APhaser 1",
+    "APhaser 2",
+    "APhaser 3",
+    "APhaser 4",
+    "APhaser 5",
+    "APhaser 6",
+};
+
+static const char *alienWahPresetNames[] = {
+    "Alien Wah 1",
+    "Alien Wah 2",
+    "Alien Wah 3",
+    "Alien Wah 4",
+};
+
+static std::vector<std::string> distortionPresetNames = {
+    "Overdrive 1",
+    "Overdrive 2",
+    "A. Exciter 1",
+    "A. Exciter 2",
+    "Guitar Amp",
+    "Quantisize",
+};
+
+static std::vector<std::string> dynFilterPresetNames = {
+    "WahWah",
+    "AutoWah",
+    "Sweep",
+    "VocalMorph 1",
+    "VocalMorph 2",
+};
+
+static std::vector<std::string> reverbTypeNames = {
+    "Random",
+    "Freeverb",
+    "Bandwidth",
+};
+
+static int const lfoTypeCount = 2;
+static std::vector<std::string> lfoTypes = {
+    "SINE",
+    "TRI",
+};
+
+static std::vector<std::string> distortionTypes = {
+    "Atan",
+    "Asym1",
+    "Pow",
+    "Sine",
+    "Qnts",
+    "Zigzg",
+    "Lmt",
+    "LmtU",
+    "LmtL",
+    "ILmt",
+    "Clip",
+    "Asym2",
+    "Pow2",
+    "Sign",
+};
+
+static std::vector<std::string> eqBandTypes = {
+    "Off",
+    "Lp1",
+    "Hp1",
+    "Lp2",
+    "Hp2",
+    "Bp2",
+    "N2",
+    "Pk",
+    "LSh",
+    "HSh",
+};
+
 ZynEditor::ZynEditor(
-    AudioEffect *effect)
-    : AEffEditor(effect)
+    ZynAudioEffectX *effect)
+    : AEffEditor(effect),
+      _zynAudioEffectX(effect)
 {}
 
 bool ZynEditor::getRect(
@@ -173,39 +309,112 @@ bool ZynEditor::getRect(
     return false;
 }
 
+void ZynEditor::Knob(
+    EffectPresets par,
+    const char *label,
+    const char *tooltip)
+{
+    Knob(int(par), label, tooltip);
+}
+
+void ZynEditor::Knob(
+    AlienWahPresets par,
+    const char *label,
+    const char *tooltip)
+{
+    Knob(int(par), label, tooltip);
+}
+
+void ZynEditor::Knob(
+    int par,
+    const char *label,
+    const char *tooltip)
+{
+    auto val = _zynAudioEffectX->EffectManager()->geteffectpar(par);
+
+    if (ImGui::KnobUchar(label, &val, 0, 127, ImVec2(60, 40), tooltip ? tooltip : label))
+    {
+        _zynAudioEffectX->EffectManager()->seteffectpar(par, val);
+    }
+}
+
 bool ZynEditor::open(
     void *ptr)
 {
     auto hwnd = static_cast<HWND>(ptr);
 
-    if (!_main.init(hwnd, 400, 200))
+    if (!_main.init(hwnd, 400, 290))
     {
         return false;
     }
-
-    static float f = 0.0f;
-    static int counter = 0;
-    static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     _main.renderUi = [&]() {
         ImGuiIO &io = ImGui::GetIO();
         (void)io;
 
+        short w, h;
+        _main.getSize(w, h);
+
         ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(w, h));
 
-        ImGui::Begin("Hello, plugn!"); // Create a window called "Hello, world!" and append into it.
+        auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
+        ImGui::Begin("AlienWah", nullptr, flags); // Create a window called "Hello, world!" and append into it.
 
-        ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
+        ImGui::SeparatorText("AlienWah");
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
+        static int item = -1;
+        if (ImGui::Combo("Preset", &item, alienWahPresetNames, IM_ARRAYSIZE(alienWahPresetNames)))
+        {
+            _zynAudioEffectX->EffectManager()->changepreset(item);
+        }
 
-        if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
+        ImGui::BeginGroup();
+        {
+            Knob(EffectPresets::Volume, "volume");
+            ImGui::SameLine();
+            Knob(EffectPresets::Panning, "pan");
+
+            Knob(AlienWahPresets::AlienWahPhase, "phase");
+            ImGui::SameLine();
+            Knob(AlienWahPresets::AlienWahDepth, "depth");
+
+            Knob(AlienWahPresets::AlienWahChannelRouting, "channel\nrouting", "channel routing");
+            ImGui::SameLine();
+            Knob(AlienWahPresets::AlienWahFeedback, "feedback");
+
+            ImGui::EndGroup();
+        }
+
         ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::BeginGroup();
+        {
+            if (ImGui::BeginChild("lfo", ImVec2(0, 90)))
+            {
+                ImGui::SeparatorText("lfo");
+
+                Knob(EffectPresets::LFOFrequency, "frequency");
+                ImGui::SameLine();
+                Knob(EffectPresets::LFORandomness, "random");
+                ImGui::SameLine();
+                Knob(EffectPresets::LFOStereo, "stereo");
+            }
+            ImGui::EndChild();
+
+            ImGui::SeparatorText("delay");
+
+            unsigned char u8_min = 1, u8_max = 127;
+
+            auto val = _zynAudioEffectX->EffectManager()->geteffectpar(int(AlienWahPresets::AlienWahDelay));
+            if (ImGui::SliderScalar("delay", ImGuiDataType_U8, &val, &u8_min, &u8_max, "%u"))
+            {
+                _zynAudioEffectX->EffectManager()->seteffectpar(int(AlienWahPresets::AlienWahDelay), val);
+            }
+
+            ImGui::EndGroup();
+        }
+
         ImGui::End();
     };
 
@@ -219,7 +428,7 @@ void ZynEditor::close()
 
 bool ZynEditor::isOpen()
 {
-    return false;
+    return _main.isOpen();
 }
 
 void ZynEditor::idle() {}
